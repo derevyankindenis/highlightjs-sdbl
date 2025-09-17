@@ -87,14 +87,37 @@ export default function (hljs) {
 
   const KEYWORDS = [...RESERVED_WORDS];
 
+  const OPERATOR = {
+    scope: "operator",
+    match: /[-+*/=%^~]|&&?|\|\|?|!=?|<(?:=>?|<|>)?|>[>=]?/,
+    relevance: 0,
+  };
+
+  const STRING = {
+    scope: "string",
+    variants: [
+      {
+        begin: /'/,
+        end: /'/,
+        contains: [{ match: /''/ }],
+      },
+    ],
+  };
+
+  const QUOTED_IDENTIFIER = {
+    begin: /"/,
+    end: /"/,
+    contains: [{ match: /""/ }],
+  };
+
   return {
     name: "sdbl",
     case_insensitive: true,
     keywords: {
       $pattern: /\b[\w\.]+/,
-      keyword: reduceRelevancy(KEYWORDS, { when: (x) => x.length < 3 }),
+      keyword: KEYWORDS, //sreduceRelevancy(KEYWORDS, { when: (x) => x.length < 3 }),
       type: TYPES,
     },
-    contains: [hljs.NUMBER_MODE],
+    contains: [STRING, hljs.NUMBER_MODE, OPERATOR, QUOTED_IDENTIFIER],
   };
 }
