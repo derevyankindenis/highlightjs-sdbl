@@ -48,31 +48,28 @@ export default function (hljs) {
     "groupedby",
   ];
 
-  // По нескольку сло
-  // "Для\\s+Изменения",
-  // "(For\\s+Update(\\s+Of)?)",
-  // "По(\\s+Общие)?",
-  // "By(\\s+Overall)?",
-  // "(Только\\s+)?Иерархия",
-  // "(Only\\s+)?Hierarchy",
-  // "Объединить(\\s+Все)?",
-  // "Union(\\s+All)?",
-  // "(Упорядочить\\s+По)",
-  // "(Order\\s+By)",
-  // "(Сгруппировать\\s+По(\\s+Группирующим\\s+Наборам)?)",
-  // "(Group\\s+By(\\s+Grouping\\s+Set)?)",
-
-  // "Левое",
-  // "Left",
-  // "Правое",
-  // "Right",
-  // "Полное",
-  // "Full",
-  // "Outer",
-  // "Соединение",
-  // "Join",
-  // "Внутреннее",
-  // "Inner",
+  const MULTI_WORD_TYPES = [
+    "левое соединение",
+    "left join",
+    "правое соединение",
+    "right join",
+    "полное соединение",
+    "full join",
+    "внутреннее соединение",
+    "inner join",
+    "объединить все",
+    "union all",
+    "для изменения",
+    "for update",
+    "упорядочить по",
+    "order by",
+    "по общие",
+    "by overall",
+    "только иерархия",
+    "only hierarchy",
+    "сгруппировать по",
+    "group by",
+  ];
 
   const TYPES = [
     "Число",
@@ -110,6 +107,24 @@ export default function (hljs) {
     contains: [{ match: /""/ }],
   };
 
+  function kws_to_regex(list) {
+    return regex.concat(
+      /\b/,
+      regex.either(
+        ...list.map((kw) => {
+          return kw.replace(/\s+/, "\\s+");
+        })
+      ),
+      /\b/
+    );
+  }
+
+  const MULTI_WORD_KEYWORDS = {
+    scope: "keyword",
+    match: kws_to_regex(MULTI_WORD_TYPES),
+    relevance: 0,
+  };
+
   return {
     name: "sdbl",
     case_insensitive: true,
@@ -118,6 +133,12 @@ export default function (hljs) {
       keyword: KEYWORDS, //sreduceRelevancy(KEYWORDS, { when: (x) => x.length < 3 }),
       type: TYPES,
     },
-    contains: [STRING, hljs.NUMBER_MODE, OPERATOR, QUOTED_IDENTIFIER],
+    contains: [
+      STRING,
+      MULTI_WORD_KEYWORDS,
+      hljs.NUMBER_MODE,
+      OPERATOR,
+      QUOTED_IDENTIFIER,
+    ],
   };
 }
